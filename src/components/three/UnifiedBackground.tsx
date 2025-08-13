@@ -144,7 +144,7 @@ const UnifiedBackground: React.FC<UnifiedBackgroundProps> = ({
           background: `
             radial-gradient(circle at 50% 30%, ${primaryColor}15 0%, transparent 60%)
           `,
-          animation: 'netlify-pulse 10s ease-in-out infinite'
+          animation: 'pulse-glow 10s ease-in-out infinite'
         }}
       />
       

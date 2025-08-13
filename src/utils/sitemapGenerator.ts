@@ -170,7 +170,6 @@ Allow: /
 # Block access to admin or sensitive areas
 Disallow: /admin/
 Disallow: /api/
-Disallow: /_netlify/
 Disallow: /node_modules/
 Disallow: /.git/
 

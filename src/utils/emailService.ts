@@ -1,5 +1,5 @@
 // Email service utility for multiple providers
-// Supports Netlify Forms, Formspree, and EmailJS
+// Supports Formspree and EmailJS
 
 export interface EmailSubmission {
   email: string;
@@ -10,31 +10,7 @@ export interface EmailSubmission {
   source: 'welcome-popup' | 'contact-form' | 'newsletter';
 }
 
-// Submit to Netlify Forms (primary method for production)
-export const submitToNetlifyForms = async (
-  formName: string, 
-  data: EmailSubmission
-): Promise<boolean> => {
-  try {
-    const formData = new FormData();
-    formData.append('form-name', formName);
-    
-    Object.entries(data).forEach(([key, value]) => {
-      if (value) formData.append(key, value.toString());
-    });
 
-    const response = await fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(formData as unknown as Record<string, string>).toString()
-    });
-
-    return response.ok;
-  } catch (error) {
-    console.error('Netlify Forms submission failed:', error);
-    return false;
-  }
-};
 
 // Submit to Formspree (backup method)
 export const submitToFormspree = async (
@@ -80,7 +56,6 @@ export const submitToEmailJS = async (
 export const submitEmail = async (
   data: EmailSubmission,
   options: {
-    netlifyFormName?: string;
     formspreeId?: string;
     emailJSConfig?: {
       serviceId: string;
@@ -92,17 +67,9 @@ export const submitEmail = async (
   method: string;
   error?: string;
 }> => {
-  const { netlifyFormName, formspreeId, emailJSConfig } = options;
+  const { formspreeId, emailJSConfig } = options;
 
-  // Try Netlify Forms first (for production)
-  if (process.env.NODE_ENV === 'production' && netlifyFormName) {
-    const netlifySuccess = await submitToNetlifyForms(netlifyFormName, data);
-    if (netlifySuccess) {
-      return { success: true, method: 'netlify' };
-    }
-  }
-
-  // Fallback to Formspree
+  // Try Formspree first (primary method)
   if (formspreeId) {
     const formspreeSuccess = await submitToFormspree(formspreeId, data);
     if (formspreeSuccess) {
@@ -132,19 +99,13 @@ export const submitEmail = async (
 // Configuration for different environments
 export const getEmailConfig = () => {
   return {
-    // Netlify Forms (automatic in production)
-    netlify: {
-      contactForm: 'contact',
-      welcomePopup: 'welcome-popup'
-    },
-    
-    // Formspree (backup - requires account setup)
+    // Formspree (primary method - requires account setup)
     formspree: {
       contactFormId: process.env.REACT_APP_FORMSPREE_CONTACT_ID,
       welcomePopupId: process.env.REACT_APP_FORMSPREE_WELCOME_ID
     },
     
-    // EmailJS (alternative - requires account setup)
+    // EmailJS (fallback - requires account setup)
     emailjs: {
       serviceId: process.env.REACT_APP_EMAILJS_SERVICE_ID,
       contactTemplateId: process.env.REACT_APP_EMAILJS_CONTACT_TEMPLATE,
@@ -166,7 +127,6 @@ await submitEmail(
     source: 'contact-form'
   },
   {
-    netlifyFormName: config.netlify.contactForm,
     formspreeId: config.formspree.contactFormId
   }
 );

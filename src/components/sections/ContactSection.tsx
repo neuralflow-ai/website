@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Users, MessageCircle, Mail, DollarSign, Briefcase } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { submitEmail, getEmailConfig } from '@/utils/emailService';
 // Removed NetworkBackground import - using unified background from App.tsx
 
 // Custom Fiverr Icon Component
@@ -94,24 +95,20 @@ const ContactSection = () => {
         });
       });
 
-      // For Netlify deployment: Submit to Netlify Forms
-      if (process.env.NODE_ENV === 'production') {
-        const formData = new FormData();
-        formData.append('form-name', 'contact');
-        formData.append('name', data.name);
-        formData.append('email', data.email);
-        formData.append('company', data.company);
-        formData.append('industry', data.industry);
-        formData.append('service', data.service);
-        formData.append('budget', data.budget);
-        formData.append('message', data.message);
-
-        await fetch('/', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(formData as unknown as Record<string, string>).toString()
-        });
-      }
+      // Submit via email service (Formspree/EmailJS)
+      const config = getEmailConfig();
+      await submitEmail(
+        {
+          email: data.email,
+          name: data.name,
+          company: data.company,
+          message: `Service: ${data.service}\nBudget: ${data.budget}\nIndustry: ${data.industry}\n\n${data.message}`,
+          source: 'contact-form'
+        },
+        {
+          formspreeId: config.formspree.contactFormId
+        }
+      );
 
       // Create email body for automatic forwarding
       const emailBody = `
@@ -132,11 +129,9 @@ Sent from NeuralFlow AI Contact Form
 Time: ${new Date().toLocaleString()}
       `.trim();
 
-      // For production: Send via Netlify Forms with email notification
+      // Log successful submission
       if (process.env.NODE_ENV === 'production') {
-        // Netlify will automatically forward this to hello@neuralflow.cloud
-        // Configure this in Netlify dashboard under Forms > Notifications
-        console.log('✅ Form submitted to Netlify - will be forwarded to hello@neuralflow.cloud');
+        console.log('✅ Form submitted successfully via email service');
       } else {
         // For development: Create mailto link
         const subject = encodeURIComponent(`New Contact Form Submission - ${data.company}`);
@@ -360,12 +355,7 @@ Time: ${new Date().toLocaleString()}
               <form 
                 onSubmit={handleSubmit(onSubmit)} 
                 className="space-y-6"
-                name="contact"
-                method="POST"
-                data-netlify="true"
-                data-netlify-honeypot="bot-field"
               >
-                <input type="hidden" name="form-name" value="contact" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="name" className="text-white mb-2 block">

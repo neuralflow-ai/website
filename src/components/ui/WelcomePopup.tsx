@@ -46,18 +46,18 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({ isOpen, onClose }) => {
           saveEmail(email, 'welcome-popup');
         });
         
-        // For Netlify deployment: Submit to Netlify Forms
-        if (process.env.NODE_ENV === 'production') {
-          const formData = new FormData();
-          formData.append('form-name', 'welcome-popup');
-          formData.append('email', email);
-
-          await fetch('/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams(formData as unknown as Record<string, string>).toString()
-          });
-        }
+        // Submit via email service
+        const { submitEmail, getEmailConfig } = await import('../../utils/emailService');
+        const config = getEmailConfig();
+        await submitEmail(
+          {
+            email,
+            source: 'welcome-popup'
+          },
+          {
+            formspreeId: config.formspree.welcomePopupId
+          }
+        );
         
         console.log('✅ Email saved from welcome popup:', email);
       } catch (error) {
@@ -150,12 +150,7 @@ const WelcomePopup: React.FC<WelcomePopupProps> = ({ isOpen, onClose }) => {
               <form 
                 onSubmit={handleSubmit} 
                 className="mb-6"
-                name="welcome-popup"
-                method="POST"
-                data-netlify="true"
-                data-netlify-honeypot="bot-field"
               >
-                <input type="hidden" name="form-name" value="welcome-popup" />
                 <div className="mb-4">
                   <input
                     type="email"
