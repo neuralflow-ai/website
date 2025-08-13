@@ -14,7 +14,7 @@ import {
   Target,
   Shield
 } from 'lucide-react';
-import NetlifyStyleHeader from '@/components/three/NetlifyStyleHeader';
+import NetworkBackground from '@/components/three/NetworkBackground';
 import TrustBadges from '@/components/TrustBadges';
 
 const stats = [
@@ -91,18 +91,11 @@ const About = () => {
         keywords="AI automation company, custom AI solutions, business process automation, AI development team, intelligent automation experts"
         canonical="https://neuralflow-ai.com/about"
       />
-      <div className="min-h-screen bg-dark-purple relative overflow-hidden">
-      {/* Netlify-style Header Background */}
-      <NetlifyStyleHeader 
-        intensity={0.6}
-        primaryColor="#00c2ff"
-        secondaryColor="#ff0080"
-        accentColor="#8b5cf6"
-        height="450px"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark-purple/30 to-transparent"></div>
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-b from-transparent via-light-purple/20 to-transparent">
+      <div className="min-h-screen bg-dark-purple">
+      {/* Hero Section with Animated Background */}
+      <section className="relative pt-32 pb-20 px-4 bg-gradient-to-b from-transparent via-light-purple/20 to-transparent overflow-hidden">
+        <NetworkBackground nodeCount={50} color="#00c2ff" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark-purple/20 to-transparent"></div>
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">

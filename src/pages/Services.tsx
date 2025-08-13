@@ -20,7 +20,7 @@ import {
   Star,
   Clock
 } from 'lucide-react';
-import UnifiedBackground from '@/components/three/UnifiedBackground';
+import NetworkBackground from '@/components/three/NetworkBackground';
 import TrustBadges from '@/components/TrustBadges';
 
 const services = [
@@ -354,19 +354,12 @@ const Services = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen bg-dark-purple">
       <SEOHead page="services" />
-      {/* Unified Background */}
-      <UnifiedBackground 
-        variant="full"
-        intensity={0.7}
-        primaryColor="#00c2ff"
-        secondaryColor="#ff0080"
-        accentColor="#8b5cf6"
-      />
-      <div className="relative z-10">
-      {/* SEO-Optimized Header */}
-      <section className="pt-32 pb-20 bg-gradient-to-b from-background/50 via-background/30 to-transparent">
+      {/* SEO-Optimized Header with Animated Background */}
+      <section className="relative pt-32 pb-20 bg-gradient-to-b from-background/50 via-background/30 to-transparent overflow-hidden">
+        <NetworkBackground nodeCount={50} color="#00c2ff" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark-purple/20 to-transparent"></div>
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -526,7 +519,6 @@ const Services = () => {
           </div>
         </div>
       </section>
-      </div>
     </div>
   );
 };
